@@ -156,7 +156,7 @@ wheels = [
 
 [[package]]
 name = "braindecode"
-version = "1.5.0"
+version = "1.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-inheritance" },
@@ -167,7 +167,6 @@ dependencies = [
     { name = "mne-bids" },
     { name = "pandas" },
     { name = "pydantic" },
-    { name = "rotary-embedding-torch" },
     { name = "skorch" },
     { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'linux'" },
     { name = "torch", version = "2.8.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "sys_platform == 'linux'" },
@@ -175,9 +174,9 @@ dependencies = [
     { name = "torchinfo" },
     { name = "wfdb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/db/fa/8553764424b11afab3a71413134785162506e2cda274caf9dd662e1b7da7/braindecode-1.5.0.tar.gz", hash = "sha256:a1625ddd0bf81a0bbd34b4b8bf0936d39eca7f2ec47a97a98c5b9ee760bd1a85", size = 10330215, upload-time = "2026-05-08T12:19:41.38Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/4e/7eb4ccf42326d86d8149025569a02ff5bda44452554fcc92ad1b8a83cad1/braindecode-1.8.1.tar.gz", hash = "sha256:9267480d04698163e4310104680a62a8d491fcffe3fbd0a8b7006f5d01b3e8b9", size = 1122886, upload-time = "2026-08-31T14:23:31.7Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/78/ff9eed836b1dccce1e1cc37bbb71c44ef055952b50943a8709d98b885ade/braindecode-1.5.0-py3-none-any.whl", hash = "sha256:7954b86725cf7ff174100f88df30a86be14ad8bd71e048a40ec561e3e8d74cf1", size = 568527, upload-time = "2026-05-08T12:19:38.724Z" },
+    { url = "https://files.pythonhosted.org/packages/42/d4/875fd5d98ac6b3a2d5cbd84aa0ed56901bec89d52f2ecfd9413b5d0d28f1/braindecode-1.8.1-py3-none-any.whl", hash = "sha256:9c25a8fe87e7fe8b1ef9e0a3236e8ced752a07bbb986911a9136742a5746dc7c", size = 679175, upload-time = "2026-08-31T14:23:29.587Z" },
 ]
 
 [package.optional-dependencies]
@@ -433,7 +432,7 @@ requires-dist = [
     { name = "lightning", specifier = ">=2.5.2,<3.0.0" },
     { name = "mne", specifier = ">=1.10,<2.0" },
     { name = "numpy", specifier = ">=2.0,<3.0" },
-    { name = "open-eeg-bench", specifier = "==0.4.0" },
+    { name = "open-eeg-bench", specifier = "==0.5.0" },
     { name = "pandas", specifier = ">=2.0,<3.0" },
     { name = "pydantic", specifier = ">=2,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3.5,<9.0.0" },
@@ -1281,7 +1280,7 @@ wheels = [
 
 [[package]]
 name = "open-eeg-bench"
-version = "0.4.0"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "braindecode", extra = ["hub"] },
@@ -1296,9 +1295,9 @@ dependencies = [
     { name = "torch", version = "2.8.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "sys_platform == 'linux'" },
     { name = "wandb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f9/0b/b769071fe38718e30fea1f70d0108c83420900f969da1e7aad3f19fad9ce/open_eeg_bench-0.4.0.tar.gz", hash = "sha256:0ac0906d03e7c4783ae02a028a1723d531dbb16e7b448878e81849c835f61d11", size = 47875, upload-time = "2026-05-07T00:47:21.561Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/03/6d05e30fe010174ff7a65d0d38ac65ad3bdc8e04a523dbe59a48da1dd5be/open_eeg_bench-0.5.0.tar.gz", hash = "sha256:d8cf9bc60b714b70f07f6402eb72373269cfaac323e5d7af519d9c18cd87e58a", size = 49898, upload-time = "2026-05-28T21:30:55.347Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/fb/4241eb35c3b36802cbe48b090cf826c094717f3cd194260bb142e133cb2a/open_eeg_bench-0.4.0-py3-none-any.whl", hash = "sha256:1ce5fefa20422430f04fe5e27886018af226c17f52fba30d789038901dc92c4f", size = 42691, upload-time = "2026-05-07T00:47:20.253Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/9c/58d83f8b0edcef954327b7699c1e452b8ffe23af531be252aa98abca32b0/open_eeg_bench-0.5.0-py3-none-any.whl", hash = "sha256:5e89244b3ed3810082c1f50e00990166a4ee556052d8c8d64b99abd9cb3a0bf2", size = 43879, upload-time = "2026-05-28T21:30:54.025Z" },
 ]
 
 [[package]]
@@ -1805,20 +1804,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
-]
-
-[[package]]
-name = "rotary-embedding-torch"
-version = "0.8.9"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "einops" },
-    { name = "torch", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'linux'" },
-    { name = "torch", version = "2.8.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "sys_platform == 'linux'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/71/38/74783585b1f0282fddd3faf1abd6dd20977255c27e31737eced2d7ec05f1/rotary_embedding_torch-0.8.9.tar.gz", hash = "sha256:b213f153cad1d108064d930544fb3af678d56515893d3f869a7a146f87997e3f", size = 7497, upload-time = "2025-07-27T01:26:14.675Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/21/05e319ebef4a8194f9c4cc09f9c3213ab846da200fa6e88699cdb7e9679a/rotary_embedding_torch-0.8.9-py3-none-any.whl", hash = "sha256:700e8de9dfbefba5f9117a66652a2520648dcc60136895f0068b6a85347cab02", size = 5872, upload-time = "2025-07-27T01:26:13.496Z" },
 ]
 
 [[package]]
