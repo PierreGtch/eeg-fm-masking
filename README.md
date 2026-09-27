@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue?logo=python&logoColor=white)](pyproject.toml)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![OpenEEGBench](https://img.shields.io/badge/%F0%9F%8F%86%20evaluated%20on-OpenEEGBench-purple)](https://huggingface.co/spaces/braindecode/OpenEEGBench)
+[![OpenEEGBench](https://img.shields.io/badge/%F0%9F%8F%86%20evaluated%20on-OpenEEGBench-purple)](https://github.com/braindecode/OpenEEGBench)
 [![GitHub stars](https://img.shields.io/github/stars/PierreGtch/eeg-fm-masking?style=flat&logo=github)](https://github.com/PierreGtch/eeg-fm-masking/stargazers)
 
 This repository contains the pre-training and downstream-evaluation code used
