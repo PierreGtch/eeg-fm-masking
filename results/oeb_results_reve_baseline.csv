@@ -1,0 +1,13 @@
+dataset,finetuning,head,seed,training,scaler,status,adapter_stats,fit_time,test_balanced_accuracy,test_r2
+braindecode/arithmetic_zyma2019,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.740,
+braindecode/bcic2a,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.517,
+braindecode/bcic2020-3,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.390,
+braindecode/physionet,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.510,
+braindecode/chbmit,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,-100,
+braindecode/faced,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.422,
+braindecode/isruc-sleep,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.662,
+braindecode/mdd_mumtaz2016,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.931,
+braindecode/seed-v,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,-100,
+braindecode/seed-vig,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,,-100
+braindecode/tuab,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.809,
+braindecode/tuev,frozen,flatten,0,ridge,,completed,"{'total_params': 69189120, 'trainable_params': 0, 'trainable_pct': 0.0, 'method': 'frozen'}",0.0,0.508,
