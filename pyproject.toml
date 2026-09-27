@@ -2,7 +2,7 @@
 name = "eeg-fm-masking"
 version = "0.1.0"
 description = "What masking geometry works best for EEG foundation models? A controlled evaluation across MAE and JEPA."
-authors = [{ name = "Anonymous" }]
+authors = [{ name = "Pierre Guetschel" }]
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [

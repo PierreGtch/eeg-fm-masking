@@ -1,7 +1,16 @@
 
 # What masking geometry works best for EEG foundation models?
 
-*A controlled evaluation across MAE and JEPA — ICLR submission, code release for review.*
+*A controlled evaluation across MAE and JEPA.*
+
+[![Website](https://img.shields.io/badge/%F0%9F%8C%90%20Website-paper%20explained-blue)](https://pierregtch.github.io/eeg-fm-masking)
+[![arXiv](https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow)](https://huggingface.co/PierreGtch/eeg-fm-masking)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue?logo=python&logoColor=white)](pyproject.toml)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![OpenEEGBench](https://img.shields.io/badge/%F0%9F%8F%86%20evaluated%20on-OpenEEGBench-purple)](https://huggingface.co/spaces/braindecode/OpenEEGBench)
+[![GitHub stars](https://img.shields.io/github/stars/PierreGtch/eeg-fm-masking?style=flat&logo=github)](https://github.com/PierreGtch/eeg-fm-masking/stargazers)
 
 This repository contains the pre-training and downstream-evaluation code used
 to produce the results presented in the article. 
