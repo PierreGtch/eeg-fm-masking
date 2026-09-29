@@ -4,7 +4,7 @@
 *A controlled evaluation across MAE and JEPA.*
 
 [![Website](https://img.shields.io/badge/%F0%9F%8C%90%20Website-paper%20explained-blue)](https://pierregtch.github.io/eeg-fm-masking)
-[![arXiv](https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
+[![arXiv](https://img.shields.io/badge/arXiv-2609.33487-b31b1b.svg)](https://arxiv.org/abs/2609.33487)
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow)](https://huggingface.co/PierreGtch/eeg-fm-masking)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue?logo=python&logoColor=white)](pyproject.toml)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.8-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
