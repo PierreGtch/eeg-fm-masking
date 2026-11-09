@@ -467,10 +467,11 @@ class MaskMaker(nn.Module):
             starts[:, None]
             + torch.arange(self.length_blocks, device=mask.device)[None, :]
         )  # (n_masks, L)
-        time_masks = torch.zeros(
-            n_target_blocks, n_times, dtype=torch.bool, device=mask.device
+        time_masks_f = torch.zeros(
+            n_target_blocks, n_times, dtype=torch.float32, device=mask.device
         )
-        time_masks.scatter_(1, time_indices, True)  # (n_masks, n_times)
+        time_masks_f.scatter_(1, time_indices, 1.0)  # (n_masks, n_times)
+        time_masks = time_masks_f > 0.5
 
         mask |= (channels_masks.unsqueeze(2) & time_masks.unsqueeze(1)).any(dim=0)
         return mask
@@ -578,16 +579,19 @@ class MaskMakerVectorized(MaskMaker):
         offsets = torch.arange(self.length_blocks, device=device)
         time_indices = starts.unsqueeze(-1) + offsets  # (b, n_target_blocks_alloc, L)
         time_masks = torch.zeros(
-            b, n_target_blocks_alloc, n_times, dtype=torch.bool, device=device
+            b, n_target_blocks_alloc, n_times, dtype=torch.float32, device=device
         )
-        time_masks.scatter_(2, time_indices, True)
+        time_masks.scatter_(2, time_indices, 1.0)
 
         # Combine spatial & temporal via matmul (avoids 4D intermediate):
         # (b, c, n_target) @ (b, n_target, n_times) → (b, c, n_times)
-        masks = torch.bmm(
-            channels_masks.permute(0, 2, 1).float(),
-            time_masks.float(),
-        ).bool()
+        masks = (
+            torch.bmm(
+                channels_masks.permute(0, 2, 1).float(),
+                time_masks,
+            )
+            > 0.5
+        )
 
         if ch_padding_mask is not None:
             masks = masks | ch_padding_mask.unsqueeze(-1)

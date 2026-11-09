@@ -53,11 +53,19 @@ class ContextualEncoder(nn.Module):
 
         mask = None
         if masker is not None:
-            mask = masker(
-                ch_pos=ch_pos,
-                ch_padding_mask=ch_padding_mask,
-                n_times=t,
-            )
+            if ch_pos.device.type == "hpu":
+                cpm_cpu = ch_padding_mask.cpu() if ch_padding_mask is not None else None
+                mask = masker(
+                    ch_pos=ch_pos.cpu(),
+                    ch_padding_mask=cpm_cpu,
+                    n_times=t,
+                ).to(ch_pos.device)
+            else:
+                mask = masker(
+                    ch_pos=ch_pos,
+                    ch_padding_mask=ch_padding_mask,
+                    n_times=t,
+                )
 
         targets_mask = mask
         if targets_mask is not None and padding_mask is not None:
