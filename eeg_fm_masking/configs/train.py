@@ -76,6 +76,10 @@ class TrainingConfig(InstantiatorConfig):
             ckpt_path = Path(artifact_dir) / "model.ckpt"
 
         framework = self.framework.create_instance()
+        if getattr(self.datamodule, "shuffle_seed", None) is not None and self.datamodule.shuffle_seed != self.seed:
+            import lightning.pytorch as pl
+
+            pl.seed_everything(self.datamodule.shuffle_seed, workers=True)
         datamodule = self.datamodule.create_instance()
 
         return framework, datamodule, trainer, ckpt_path

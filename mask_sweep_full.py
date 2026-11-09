@@ -215,8 +215,21 @@ def make_framework(model_kind: str):
     return cfg
 
 
-def make_config(model_kind: str, mask: dict, seed: int = 42):
-    """Build a TrainingConfig for one (model × mask) combination."""
+def make_config(
+    model_kind: str,
+    mask: dict,
+    seed: int = 42,
+    shuffle_seed: int | None = None,
+):
+    """Build a TrainingConfig for one (model × mask) combination.
+
+    Args:
+        model_kind: 'mae' or 'jepa_*' variant.
+        mask: Mask geometry dictionary from MASK_STRATEGIES.
+        seed: Network weights initialization seed (passed to TrainingConfig.seed).
+        shuffle_seed: Pretraining dataset shuffle seed (defaults to `seed` if None).
+    """
+    eff_shuffle_seed = seed if shuffle_seed is None else shuffle_seed
     framework_cfg = make_framework(model_kind)
     framework_cfg.model.masker = MaskMakerConfig(
         radius_blocks=mask["radius_blocks"],
@@ -246,7 +259,7 @@ def make_config(model_kind: str, mask: dict, seed: int = 42):
             train_cache_dir=TRAIN_CACHE_DIR,
             val_cache_dir=None,
             positions_dir=POSITIONS_DIR,
-            shuffle_seed=seed,
+            shuffle_seed=eff_shuffle_seed,
             dataset_wrapper=DatasetWrapperConfig(
                 ch_pos=True,
                 ch_names=False,
@@ -256,7 +269,7 @@ def make_config(model_kind: str, mask: dict, seed: int = 42):
                 n_chans=N_CHANNELS,
                 scaler=SCALER,
                 clip_sigma=CLIP_SIGMA,
-                seed=seed,
+                seed=eff_shuffle_seed,
             ),
             batch_size=BATCH_SIZE,
             num_workers=NUM_WORKERS,
