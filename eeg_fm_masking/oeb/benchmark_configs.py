@@ -202,16 +202,17 @@ def run_low_label_probe(
             _, tr_set, val_set, te_set, info = ds_cfg.setup(normalization=bb.normalization)
             model = bb.build(info["n_chans"], info["n_times"], info["n_outputs"], info["sfreq"], info["chs_info"]).to(device).eval()
             FlattenHead().apply(model, info["n_outputs"], bb.head_module_name)
-            H, Y, P = {k: [] for k in ("tr", "val", "te")}, {k: [] for k in ("tr", "val", "te")}, None
+            H, Y, P = {k: {s: [] for s in range(n_seeds)} for k in ("tr", "val", "te")}, {k: [] for k in ("tr", "val", "te")}, None
             with torch.no_grad():
                 for k, ds in (("tr", tr_set), ("val", val_set), ("te", te_set)):
                     for b in DataLoader(ds, batch_size=64):
                         h = model(b[0].to(device)).cpu().to(torch.float64)
                         if P is None and h.shape[1] > 5000:
-                            P = _make_projection_matrix(h.shape[1], 5000, seed=0, device="cpu", dtype=torch.float64)
-                        H[k].append(h @ P.T if P is not None else h)
+                            P = {s: _make_projection_matrix(h.shape[1], 5000, seed=s, device="cpu", dtype=torch.float64) for s in range(n_seeds)}
+                        for s in range(n_seeds):
+                            H[k][s].append(h @ P[s].T if P is not None else h)
                         Y[k].append(torch.as_tensor(b[1]))
-            H = {k: torch.cat(v) for k, v in H.items()}
+            H = {k: {s: torch.cat(v[s]) for s in range(n_seeds)} for k, v in H.items()}
             Y = {k: torch.cat(v) for k, v in Y.items()}
             y_tr, y_te = Y["tr"].numpy(), Y["te"].numpy()
             for f in fractions:
@@ -223,10 +224,10 @@ def run_low_label_probe(
                         idx, _ = next(sp.split(np.zeros(len(y_tr)), y_tr))
                     lrn = StreamingRidgeProbeLearner(
                         torch.nn.Identity(), ds_cfg.n_classes, 256, 0, "cpu", None,
-                        TensorDataset(H["val"], Y["val"]), None, s, "balanced", "float64", 0
+                        TensorDataset(H["val"][s], Y["val"]), None, s, "balanced", "float64", 0
                     )
-                    lrn.fit(TensorDataset(H["tr"][idx], Y["tr"][idx]))
-                    pred = lrn.predict(TensorDataset(H["te"], Y["te"]))
+                    lrn.fit(TensorDataset(H["tr"][s][idx], Y["tr"][idx]))
+                    pred = lrn.predict(TensorDataset(H["te"][s], Y["te"]))
                     sc = r2_score(y_te, pred.ravel()) if ds_cfg.n_classes is None else balanced_accuracy_score(y_te, pred)
                     rows.append({"run_id": MASK_SWEEP_RUN_IDS[run], "framework": run.framework, "radius": run.radius, "length": run.length, "dataset": ds_name, "fraction": f, "seed": s, "score": float(sc)})
     return pd.DataFrame(rows)
