@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from torch import nn
 import torch
+import torch.nn.functional as F
 import einops
 from lightning.pytorch import LightningModule
 from lightning.pytorch.utilities import grad_norm
@@ -89,7 +90,9 @@ class SSLFramework(LightningModule):
     def _forward_teacher(self, batch):
         self.ema_model.eval()
         out = self.ema_model(
-            batch, return_last_n_outputs=self.cfg.average_top_k_outputs
+            batch,
+            return_last_n_outputs=self.cfg.average_top_k_outputs,
+            force_pos_dropout=self.ema_model.pos_dropout > 0.0,
         )
         z_list = out["ctx_features"]
         if not isinstance(z_list, list):
@@ -98,6 +101,10 @@ class SSLFramework(LightningModule):
         for z in z_list[1:]:
             targets.add_(z.float())
         targets = targets.div_(len(z_list))
+        if self.cfg.normalize_targets:
+            targets = targets - targets.mean(dim=2, keepdim=True)
+            targets = targets - targets.mean(dim=0, keepdim=True)
+            targets = F.layer_norm(targets, (targets.shape[-1],))
         return targets
 
     def forward(

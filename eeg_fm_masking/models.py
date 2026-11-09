@@ -1,17 +1,31 @@
 from torch import nn
+import torch.nn.functional as F
 import einops
 
 
 class ContextualEncoder(nn.Module):
-    def __init__(self, *, feature_encoder=None, pos_encoder, transformer, masker=None):
+    def __init__(
+        self,
+        *,
+        feature_encoder=None,
+        pos_encoder,
+        transformer,
+        masker=None,
+        pos_dropout: float = 0.0,
+    ):
         super().__init__()
         self.feature_encoder = feature_encoder
         self.pos_encoder = pos_encoder
         self.transformer = transformer
         self.masker = masker
+        self.pos_dropout = pos_dropout
 
     def forward(
-        self, batch, return_last_n_outputs: int = 1, apply_mask: bool = True
+        self,
+        batch,
+        return_last_n_outputs: int = 1,
+        apply_mask: bool = True,
+        force_pos_dropout: bool = False,
     ) -> dict:
         X = batch["X"]
         ch_pos = batch["ch_pos"]
@@ -39,7 +53,9 @@ class ContextualEncoder(nn.Module):
         out["pos_encoding"] = pos_encoding
         out["pos_encoding_spat"] = pos_encoding_spat
         out["pos_encoding_time"] = pos_encoding_time
-        z = local_features + pos_encoding
+        z = local_features + F.dropout(
+            pos_encoding, self.pos_dropout, self.training or force_pos_dropout
+        )
 
         mask = None
         if masker is not None:
@@ -69,4 +85,5 @@ class ContextualEncoder(nn.Module):
             feature_encoder=obj.feature_encoder,
             pos_encoder=obj.pos_encoder,
             transformer=obj.transformer,
+            pos_dropout=obj.pos_dropout,
         )
