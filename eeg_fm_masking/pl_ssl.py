@@ -90,9 +90,7 @@ class SSLFramework(LightningModule):
     def _forward_teacher(self, batch):
         self.ema_model.eval()
         out = self.ema_model(
-            batch,
-            return_last_n_outputs=self.cfg.average_top_k_outputs,
-            force_pos_dropout=self.ema_model.pos_dropout > 0.0,
+            batch, return_last_n_outputs=self.cfg.average_top_k_outputs
         )
         z_list = out["ctx_features"]
         if not isinstance(z_list, list):
@@ -103,7 +101,12 @@ class SSLFramework(LightningModule):
         targets = targets.div_(len(z_list))
         if self.cfg.normalize_targets:
             targets = targets - targets.mean(dim=2, keepdim=True)
-            targets = targets - targets.mean(dim=0, keepdim=True)
+            if (cpm := batch.get("ch_padding_mask")) is not None:
+                valid = (~cpm).float().unsqueeze(-1).unsqueeze(-1)
+                ch_mean = (targets * valid).sum(dim=1, keepdim=True) / valid.sum(dim=1, keepdim=True).clamp(min=1.0)
+            else:
+                ch_mean = targets.mean(dim=1, keepdim=True)
+            targets = targets - ch_mean
             targets = F.layer_norm(targets, (targets.shape[-1],))
         return targets
 

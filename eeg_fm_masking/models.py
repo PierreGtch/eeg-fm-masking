@@ -21,11 +21,7 @@ class ContextualEncoder(nn.Module):
         self.pos_dropout = pos_dropout
 
     def forward(
-        self,
-        batch,
-        return_last_n_outputs: int = 1,
-        apply_mask: bool = True,
-        force_pos_dropout: bool = False,
+        self, batch, return_last_n_outputs: int = 1, apply_mask: bool = True
     ) -> dict:
         X = batch["X"]
         ch_pos = batch["ch_pos"]
@@ -53,9 +49,7 @@ class ContextualEncoder(nn.Module):
         out["pos_encoding"] = pos_encoding
         out["pos_encoding_spat"] = pos_encoding_spat
         out["pos_encoding_time"] = pos_encoding_time
-        z = local_features + F.dropout(
-            pos_encoding, self.pos_dropout, self.training or force_pos_dropout
-        )
+        z = local_features + F.dropout(pos_encoding, self.pos_dropout, self.training)
 
         mask = None
         if masker is not None:
