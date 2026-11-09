@@ -92,14 +92,25 @@ def run_csv_analyses() -> dict:
 
 
 @torch.no_grad()
-def run_hf_collapse_check(epochs: tuple[int, ...] = (1, 5, 10)) -> dict:
-    gen = torch.Generator().manual_seed(42)
-    X = torch.randn(16, 32, 2000, generator=gen)
-    phi, theta = torch.linspace(0.2, 1.2, 32), torch.linspace(0, 2 * math.pi, 32)
-    pos = torch.stack([0.09 * torch.sin(phi) * torch.cos(theta), 0.09 * torch.sin(phi) * torch.sin(theta), 0.09 * torch.cos(phi)], -1).unsqueeze(0).expand(16, -1, -1)
+def run_hf_collapse_check(
+    epochs: tuple[int, ...] = (1, 2, 3, 5, 7, 10),
+    keys: tuple[str, ...] = ("jepa_rall_L2", "jepa_r9cm_L2", "mae_rall_L2", "mae_r9cm_L2"),
+) -> dict:
+    from open_eeg_bench.default_configs import ALL_DATASETS
+    from eeg_fm_masking.functions import scale_signal
+    from eeg_fm_masking.oeb.utils import hf_backbone
+    from eeg_fm_masking.oeb.constants import MaskRun
+
+    ds_cfg = ALL_DATASETS["bcic2a"](preload=True)
+    bb = hf_backbone(MaskRun(0.09, 2, "jepa_noreg"))
+    _, _, val_set, _, info = ds_cfg.setup(normalization=bb.normalization)
+    X_raw = torch.stack([torch.as_tensor(val_set[i][0], dtype=torch.float32) for i in range(min(64, len(val_set)))])
+    X = scale_signal(X_raw, 1e6, "median_std_clip", 15.0)
+    pos = torch.tensor([ch["loc"][:3] for ch in info["chs_info"]], dtype=torch.float32).unsqueeze(0).expand(len(X), -1, -1).contiguous()
+
     vl, cl = VarLoss(1.0), CovLoss()
     out = {}
-    for key in ("jepa_rall_L2", "jepa_r9cm_L2"):
+    for key in keys:
         repo = f"PierreGtch/eeg-fm-masking_{key}"
         raw = json.loads(Path(hf_hub_download(repo, "config.json", token=False)).read_text())
         cfg = ContextualEncoderConfig(**{k: v for k, v in raw.items() if k in ContextualEncoderConfig.model_fields})
@@ -116,12 +127,19 @@ def run_hf_collapse_check(epochs: tuple[int, ...] = (1, 5, 10)) -> dict:
             M = z.mean(0, keepdim=True)
             sig_pos = float(M.squeeze(0).reshape(-1, z.shape[-1]).std(0).mean())
             sig_eeg = float((z - M).std(0).mean())
+            flat = einops.rearrange(z, "b c t d -> (b c t) d")
+            per_dim_std = float(flat.std(dim=0).mean())
+            s = torch.linalg.svdvals(flat - flat.mean(0, keepdim=True))
+            p = s / s.sum().clamp(min=1e-12)
+            rankme = float(torch.exp(-(p * torch.log(p.clamp(min=1e-12))).sum()))
             out[key][f"ep{ep:02d}"] = {
                 "sigma_token": round(sig_pos, 4),
                 "sigma_sample_at_ct": round(sig_eeg, 4),
                 "signal_to_pos_ratio": round(sig_eeg / max(sig_pos, 1e-8), 4),
-                "var_loss": round(float(vl(einops.rearrange(z, "b c t d -> (b c t) d"))), 4),
-                "cov_loss": round(float(cl(einops.rearrange(z, "b c t d -> (b c t) d"))), 4),
+                "per_dim_std": round(per_dim_std, 4),
+                "var_loss": round(float(vl(flat)), 4),
+                "cov_loss": round(float(cl(flat)), 4),
+                "rankme": round(rankme, 2),
             }
     return out
 
