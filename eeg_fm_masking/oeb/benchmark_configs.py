@@ -149,7 +149,7 @@ _REBUTTAL_RUNS = [
 
 
 def get_configs_adaptation(datasets: list[str] | None = None) -> list[tuple[Experiment, dict]]:
-    """Representative masks × (ridge_probe, lora, full_finetune, frozen) × 3 seeds via HF Hub."""
+    """Representative masks × (ridge_probe, lora, full_finetune) × 5 seeds via HF Hub."""
     import itertools
     from open_eeg_bench.default_configs.experiments import make_all_experiments
     from eeg_fm_masking.oeb.utils import hf_backbone
