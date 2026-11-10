@@ -157,8 +157,8 @@ def get_configs_adaptation(datasets: list[str] | None = None) -> list[tuple[Expe
     base = make_all_experiments(
         datasets=datasets,
         heads=["linear_head"],
-        finetuning_strategies=["ridge_probe", "lora", "full_finetune", "frozen"],
-        n_seeds=3,
+        finetuning_strategies=["ridge_probe", "lora", "full_finetune"],
+        n_seeds=5,
     )
     bbs = {run: hf_backbone(run) for run in _REBUTTAL_RUNS}
     eams: list[tuple[Experiment, dict]] = []
