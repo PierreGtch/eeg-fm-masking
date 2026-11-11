@@ -249,3 +249,22 @@ def build_experiments_and_metadata(
         }
         experiments_and_metadata.append((exp.infra.clone_obj(overrides), metadata))
     return experiments_and_metadata
+
+
+def hf_backbone(run):
+    """Build PretrainedBackbone directly from public HuggingFace checkpoint."""
+    import json
+    import math
+    from huggingface_hub import hf_hub_download
+    from open_eeg_bench.backbone import PretrainedBackbone
+
+    fw = "mae" if run.framework == "mae" else "jepa"
+    r = "one" if run.radius == 0 else ("all" if math.isinf(run.radius) else f"{int(round(run.radius * 100))}cm")
+    repo = f"PierreGtch/eeg-fm-masking_{fw}_r{r}_L{run.length}"
+    cfg = json.loads(Path(hf_hub_download(repo, "config.json", token=False)).read_text())
+    return PretrainedBackbone(
+        model_cls="eeg_fm_masking.oeb.wrapper.ContextualEncoderBenchmarkWrapper",
+        hub_repo=repo,
+        model_kwargs=cfg,
+    )
+
