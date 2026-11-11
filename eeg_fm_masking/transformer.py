@@ -96,6 +96,8 @@ class MultiHeadAttention(nn.Module):
         key = key.unflatten(-1, [self.nheads, self.E_head]).transpose(1, 2)
         value = value.unflatten(-1, [self.nheads, self.E_head]).transpose(1, 2)
 
+        if attn_mask is not None and attn_mask.dtype == torch.bool and query.device.type == "hpu":
+            attn_mask = torch.zeros_like(attn_mask, dtype=query.dtype).masked_fill(~attn_mask, float("-inf"))
         attn_output = F.scaled_dot_product_attention(
             query, key, value,
             attn_mask=attn_mask, dropout_p=self.dropout, is_causal=is_causal,

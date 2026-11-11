@@ -61,7 +61,6 @@ def _make_encoder(DIM: int, pos_encoder) -> ContextualEncoderConfig:
             d_model=DIM,
             dim_feedforward=_ffn_dim(DIM),
             dropout=0.0,
-            criss_cross_attn=False,
             bias=False,
             norm="rms_norm",
             activation="gelu",

@@ -37,6 +37,7 @@ class SSLFrameworkConfig(InstantiatorConfig):
     var_loss_target: float = 1.0
 
     cov_loss_weight: float = 1.0
+    normalize_targets: bool = False
 
     ema_decay: float = 0.999  # initial ema decay rate
     ema_end_decay: float = 0.9999  # final ema decay rate

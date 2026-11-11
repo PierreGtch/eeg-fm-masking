@@ -1,14 +1,24 @@
 from torch import nn
+import torch.nn.functional as F
 import einops
 
 
 class ContextualEncoder(nn.Module):
-    def __init__(self, *, feature_encoder=None, pos_encoder, transformer, masker=None):
+    def __init__(
+        self,
+        *,
+        feature_encoder=None,
+        pos_encoder,
+        transformer,
+        masker=None,
+        pos_dropout: float = 0.0,
+    ):
         super().__init__()
         self.feature_encoder = feature_encoder
         self.pos_encoder = pos_encoder
         self.transformer = transformer
         self.masker = masker
+        self.pos_dropout = pos_dropout
 
     def forward(
         self, batch, return_last_n_outputs: int = 1, apply_mask: bool = True
@@ -39,15 +49,23 @@ class ContextualEncoder(nn.Module):
         out["pos_encoding"] = pos_encoding
         out["pos_encoding_spat"] = pos_encoding_spat
         out["pos_encoding_time"] = pos_encoding_time
-        z = local_features + pos_encoding
+        z = local_features + F.dropout(pos_encoding, self.pos_dropout, self.training)
 
         mask = None
         if masker is not None:
-            mask = masker(
-                ch_pos=ch_pos,
-                ch_padding_mask=ch_padding_mask,
-                n_times=t,
-            )
+            if ch_pos.device.type == "hpu":
+                cpm_cpu = ch_padding_mask.cpu() if ch_padding_mask is not None else None
+                mask = masker(
+                    ch_pos=ch_pos.cpu(),
+                    ch_padding_mask=cpm_cpu,
+                    n_times=t,
+                ).to(ch_pos.device)
+            else:
+                mask = masker(
+                    ch_pos=ch_pos,
+                    ch_padding_mask=ch_padding_mask,
+                    n_times=t,
+                )
 
         targets_mask = mask
         if targets_mask is not None and padding_mask is not None:
@@ -69,4 +87,5 @@ class ContextualEncoder(nn.Module):
             feature_encoder=obj.feature_encoder,
             pos_encoder=obj.pos_encoder,
             transformer=obj.transformer,
+            pos_dropout=obj.pos_dropout,
         )

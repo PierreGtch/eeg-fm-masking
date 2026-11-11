@@ -192,14 +192,16 @@ assert len(MASK_STRATEGIES) == 29, (
 
 
 def make_framework(model_kind: str):
-    """Return a framework config for 'mae' or 'jepa_noreg'."""
+    """Return a framework config for 'mae' or JEPA variants."""
     if model_kind == "mae":
         cfg = get_reve_small_config_config(DIM=DIM)
-    elif model_kind == "jepa_noreg":
+    elif model_kind.startswith("jepa_"):
         cfg = get_reve_small_jepa_config(DIM=DIM)
-        cfg.var_loss_weight = VAR_LOSS_WEIGHT
+        cfg.var_loss_weight = 25.0 if model_kind == "jepa_vicreg" else VAR_LOSS_WEIGHT
         cfg.var_loss_target = VAR_LOSS_TARGET
-        cfg.cov_loss_weight = COV_LOSS_WEIGHT
+        cfg.cov_loss_weight = 1.0 if model_kind == "jepa_vicreg" else COV_LOSS_WEIGHT
+        cfg.normalize_targets = model_kind == "jepa_target_norm"
+        cfg.model.pos_dropout = 0.5 if model_kind == "jepa_pos_drop" else 0.0
         cfg.ema_decay = EMA_DECAY
         cfg.ema_end_decay = EMA_END_DECAY
         cfg.ema_anneal_end_step = EMA_ANNEAL_END_STEP
@@ -213,8 +215,21 @@ def make_framework(model_kind: str):
     return cfg
 
 
-def make_config(model_kind: str, mask: dict):
-    """Build a TrainingConfig for one (model × mask) combination."""
+def make_config(
+    model_kind: str,
+    mask: dict,
+    seed: int = 42,
+    shuffle_seed: int | None = None,
+):
+    """Build a TrainingConfig for one (model × mask) combination.
+
+    Args:
+        model_kind: 'mae' or 'jepa_*' variant.
+        mask: Mask geometry dictionary from MASK_STRATEGIES.
+        seed: Network weights initialization seed (passed to TrainingConfig.seed).
+        shuffle_seed: Pretraining dataset shuffle seed (defaults to `seed` if None).
+    """
+    eff_shuffle_seed = seed if shuffle_seed is None else shuffle_seed
     framework_cfg = make_framework(model_kind)
     framework_cfg.model.masker = MaskMakerConfig(
         radius_blocks=mask["radius_blocks"],
@@ -237,13 +252,14 @@ def make_config(model_kind: str, mask: dict):
     )
 
     config = TrainingConfig.model_construct(
-        seed=42,
+        seed=seed,
         trainer=PLTrainerConfig(**trainer_kwargs),
         framework=framework_cfg,
         datamodule=ReveCacheDataModuleConfig(
             train_cache_dir=TRAIN_CACHE_DIR,
             val_cache_dir=None,
             positions_dir=POSITIONS_DIR,
+            shuffle_seed=eff_shuffle_seed,
             dataset_wrapper=DatasetWrapperConfig(
                 ch_pos=True,
                 ch_names=False,
@@ -253,6 +269,7 @@ def make_config(model_kind: str, mask: dict):
                 n_chans=N_CHANNELS,
                 scaler=SCALER,
                 clip_sigma=CLIP_SIGMA,
+                seed=eff_shuffle_seed,
             ),
             batch_size=BATCH_SIZE,
             num_workers=NUM_WORKERS,
@@ -297,7 +314,7 @@ def make_config(model_kind: str, mask: dict):
             class_path="lightning.pytorch.callbacks.LearningRateMonitor",
         ),
     ]
-    if model_kind == "jepa_noreg":
+    if model_kind.startswith("jepa_"):
         callbacks.append(
             PathInstantiatorConfig(
                 class_path="eeg_fm_masking.collapse_detector.CollapseDetectorCallback",

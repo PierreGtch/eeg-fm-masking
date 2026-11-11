@@ -3,6 +3,7 @@ from copy import deepcopy
 
 from torch import nn
 import torch
+import torch.nn.functional as F
 import einops
 from lightning.pytorch import LightningModule
 from lightning.pytorch.utilities import grad_norm
@@ -98,6 +99,15 @@ class SSLFramework(LightningModule):
         for z in z_list[1:]:
             targets.add_(z.float())
         targets = targets.div_(len(z_list))
+        if self.cfg.normalize_targets:
+            targets = targets - targets.mean(dim=2, keepdim=True)
+            if (cpm := batch.get("ch_padding_mask")) is not None:
+                valid = (~cpm).float().unsqueeze(-1).unsqueeze(-1)
+                ch_mean = (targets * valid).sum(dim=1, keepdim=True) / valid.sum(dim=1, keepdim=True).clamp(min=1.0)
+            else:
+                ch_mean = targets.mean(dim=1, keepdim=True)
+            targets = targets - ch_mean
+            targets = F.layer_norm(targets, (targets.shape[-1],))
         return targets
 
     def forward(

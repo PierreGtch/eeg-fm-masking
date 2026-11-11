@@ -227,6 +227,7 @@ class ContextualEncoderConfig(InstantiatorConfig):
         Field(default_factory=PositionalEncoderConfig),
     ]
     shared_feature_encoder: bool = True
+    pos_dropout: float = 0.0
 
     def set_dim(self, dim: int):
         """Set the number of dimensions of the models embeddings."""
@@ -265,5 +266,6 @@ class ContextualEncoderConfig(InstantiatorConfig):
             pos_encoder=self.pos_encoder.create_instance(),
             transformer=self.transformer.create_instance(),
             masker=masker,
+            pos_dropout=self.pos_dropout,
         )
         return contextual_encoder, shared_feature_encoder
